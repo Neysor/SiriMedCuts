@@ -72,10 +72,10 @@ function schmerzmittel_kinder(applikation, medikament, gewicht) {
                     }
                 }
             } else {
-                txt = "Keine oralen Präparate hinterlegt<br>"
+                txt = "Keine rektalen Präparate hinterlegt<br>"
             }
         }
-        
+
 
         ret = medikament + " " + applikation + ":" + "<br>"
         ret += txt
