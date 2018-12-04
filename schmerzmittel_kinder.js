@@ -31,7 +31,6 @@ var med = [
     {
         name: "Naproxen",
     },
-
 ]
 
 function schmerzmittel_kinder(applikation, medikament, gewicht) {
@@ -40,18 +39,18 @@ function schmerzmittel_kinder(applikation, medikament, gewicht) {
 
     if(medikament == "Ibuprofen") {
         //Erst ab 3 Monaten und ab 6kg
-        Tagesdosis = Number.parseFloat(30 * gewicht).toFixed(2)
-        Einzeldosis = Number.parseFloat(10 * gewicht).toFixed(2)
-        txt = "";
+        var Tagesdosis = Number.parseFloat(30 * gewicht).toFixed(2)
+        var Einzeldosis = Number.parseFloat(10 * gewicht).toFixed(2)
+        var txt = "";
 
 
         if (applikation == "oral") {
             mymed = med.find(function (elm) {
-                elm.name = "Ibuprofen"
+                return elm.name == "Ibuprofen"
             });
             if (mymed.prepO != null) {
                 for (i = 0; i < mymed.prepO.length; i++) {
-                    ml = Number.parseFloat(Einzeldosis / ibu.prepO[i].mgpe).toFixed(1);
+                    ml = Number.parseFloat(Einzeldosis / mymed.prepO[i].mgpe).toFixed(1);
                     txt += mymed.prepO[i].name + " " + ml + "ml 3x täglich<br>"
                 }
             } else {
