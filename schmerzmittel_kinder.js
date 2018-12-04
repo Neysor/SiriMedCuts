@@ -7,6 +7,11 @@ var med = [
                 mgpe: 40,
                 cave: "",
             },
+            {
+                name: "Nureflex Saft 20mg/ml",
+                mgpe: 20,
+                cave: "",
+            },
         ],
         prepI: null,
         prepR: [
@@ -24,6 +29,37 @@ var med = [
     },
     {
         name: "Paracetamol",
+        prepO: [
+            {
+                name: "Mexalen Sirup 200mg/5ml",
+                mgpe: 40,
+                cave: "",
+            },
+        ],
+        prepI: [
+            {
+                name: "Paracetamol Ampulle od. Flasche",
+                mgpe: 10,
+                cave: "10 mg/ml",
+            },
+        ],
+        prepR: [
+            {
+                name:"Mexalen Supp 125mg",
+                mgpe: 125,
+                cave: "",
+            },
+            {
+                name:"Mexalen Supp 250mg",
+                mgpe: 250,
+                cave: "",
+            },
+            {
+                name:"Mexalen Supp 500mg",
+                mgpe: 500,
+                cave: "",
+            },
+        ],
     },
     {
         name: "Mefenaminsäure",
@@ -104,13 +140,15 @@ function schmerzmittel_kinder(applikation, medikament, gewicht) {
             if (mymed.prepR != null) {
                 for (i = 0; i < mymed.prepR.length; i++) {
                     if(mymed.prepR[i].mgpe <= Einzeldosis) {
+
                         mg = Number.parseFloat(mymed.prepR[i].mgpe*3).toFixed(0)
                         txt += mymed.prepR[i].name + " 3x täglich (= "+ mg +"mg TD)<br>"
                         txt += mymed.prepR[i].cave
                     } else if(mymed.prepR[i].mgpe <= Einzeldosis*3/2) {
+
                         mg = Number.parseFloat(mymed.prepR[i].mgpe*2).toFixed(0)
-                        txt += mymed.prepR[i].name + " 2x täglich (= "+ mg +"mg TD)<br>"
-                        txt += mymed.prepR[i].cave
+                        txt  += mymed.prepR[i].name + " 2x täglich (= "+ mg +"mg TD)<br>"
+                        txt  += mymed.prepR[i].cave
                     }
                 }
 
@@ -125,9 +163,71 @@ function schmerzmittel_kinder(applikation, medikament, gewicht) {
         ret += "Einzeldosis: " + Einzeldosis.toFixed(0) + "mg ("+ED+"mg/kg)"
 
     } else if(medikament == "Paracetamol") {
-        ret += "Noch nicht im System möglich<br>"
-    } else if(medikament == "Mefenaminsäure") {
+        var TD = 60
+        var ED = 15
+        var Tagesdosis = TD * gewicht
+        var Einzeldosis = ED * gewicht
 
+        var txt = "";
+        mymed = med.find(function (elm) {
+            return elm.name == "Paracetamol"
+        });
+
+        if (applikation == "oral") {
+            if(gewicht < 10) {
+                var TD = 30
+                var ED = 7.5
+                var Tagesdosis = TD * gewicht
+                var Einzeldosis = ED * gewicht
+            }
+
+            if (mymed.prepO != null) {
+                for (i = 0; i < mymed.prepO.length; i++) {
+                    ml = Number.parseFloat(Einzeldosis / mymed.prepO[i].mgpe).toFixed(1)
+                    mg = Number.parseFloat(ml*mymed.prepO[i].mgpe*3).toFixed(0)
+                    txt += mymed.prepO[i].name + " " + ml + "ml 3x täglich (= "+ mg +"mg TD)<br>"
+                    txt += mymed.prepO[i].cave
+                }
+                txt += "<br>oral: bis 2 Jahre eher rektal geben<br>"
+            } else {
+                txt = "Keine oralen Präparate hinterlegt<br>"
+            }
+        } else if (applikation == "rektal") {
+            if (mymed.prepR != null) {
+                for (i = 0; i < mymed.prepR.length; i++) {
+                    if(mymed.prepR[i].mgpe <= Einzeldosis) {
+                        mg = Number.parseFloat(mymed.prepR[i].mgpe*3).toFixed(0)
+                        txt += mymed.prepR[i].name + " 3x täglich (= "+ mg +"mg TD)<br>"
+                        txt += mymed.prepR[i].cave
+                    } else if(mymed.prepR[i].mgpe <= Einzeldosis*3/2) {
+                        mg = Number.parseFloat(mymed.prepR[i].mgpe*2).toFixed(0)
+                        txt += mymed.prepR[i].name + " 2x täglich (= "+ mg +"mg TD)<br>"
+                        txt += mymed.prepR[i].cave
+                    }
+                }
+
+                txt += "<br>rektal: initial tlw. höhere Dosen möglich<br>"
+            } else {
+                txt = "Keine rektalen Präparate hinterlegt<br>"
+            }
+        } else if (applikation == "intravenös") {
+            if(gewicht < 10) {
+                var TD = 30
+                var ED = 7.5
+                var Tagesdosis = TD * gewicht
+                var Einzeldosis = ED * gewicht
+            }
+
+                txt += mymed.prepI[0].name + " (" + mymed.prepI[0].cave +")<br>"+
+                    Einzeldosis.toFixed(0) + "mg (="+(Einzeldosis*3).toFixed(0)+
+                    "mg) 3x täglich<br>"
+
+        }
+
+        ret += txt + "<br>"
+        ret += "Tagesdosis: " + Tagesdosis.toFixed(0) + "mg ("+TD+"mg/kg)<br>"
+        ret += "Einzeldosis: " + Einzeldosis.toFixed(0) + "mg ("+ED+"mg/kg)"
+    } else if(medikament == "Mefenaminsäure") {
 
         var txt = "";
         mymed = med.find(function (elm) {
@@ -219,7 +319,7 @@ function schmerzmittel_kinder(applikation, medikament, gewicht) {
             txt += mymed.prepI[0].name + " (" + mymed.prepI[0].cave + ")<br>" +
                 dosis1.toFixed(0) + "mg (= " + mgdosis1.toFixed(0) + "mg TD) oder<br>" +
                 dosis2.toFixed(0) + "mg (= " + mgdosis2.toFixed(0) + "mg TD) oder<br>[" +
-                dosis3.toFixed(0) + "mg) (= " + mgdosis3.toFixed(0) + "mg TD)]<br>bis 3x täglich<br>"
+                dosis3.toFixed(0) + "mg (= " + mgdosis3.toFixed(0) + "mg TD)]<br> 3x täglich<br>"
 
             ret += txt + "<br>"
             ret += "iv: ab 1 Jahr, ab ~9kg<br>"
